@@ -1,1 +1,98 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Geolink - Mappa archeologica</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <style>
+    body { margin:0; font-family: Arial, sans-serif; }
+    #map { height: 90vh; }
+    header { padding:10px; background:#2b6cb0; color:white; }
+    .infoBox { padding:10px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Geolink — Mappa archeologica (demo)</h1>
+    <div class="infoBox">Clicca un puntino per vedere la scheda. Segnala problemi col pulsante "Segnala".</div>
+  </header>
+
+  <div id="map"></div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <script>
+    // Crea la mappa
+    var map = L.map('map').setView([41.9, 12.5], 6); // centro su Italia
+
+    // Usa le piastrelle gratuite OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Esempio di dati: qui metti i tuoi siti (GeoJSON)
+    var sites = {
+      "type":"FeatureCollection",
+      "features":[
+        {
+          "type":"Feature",
+          "properties":{
+            "name":"Anfiteatro Museo",
+            "summary":"Anfiteatro di esempio, epoca romana.",
+            "visit":"Aperto al pubblico. Orari: 9-18",
+            "id":"site-1"
+          },
+          "geometry":{
+            "type":"Point",
+            "coordinates":[12.4922,41.8902]
+          }
+        },
+        {
+          "type":"Feature",
+          "properties":{
+            "name":"Villa Antica",
+            "summary":"Villa con mosaici.",
+            "visit":"Visite guidate il sabato.",
+            "id":"site-2"
+          },
+          "geometry":{
+            "type":"Point",
+            "coordinates":[10.4017,43.7228]
+          }
+        }
+      ]
+    };
+
+    // Aggiunge i marker sulla mappa
+    function onEachFeature(feature, layer) {
+      if (!feature.properties) return;
+      var html = '<b>' + feature.properties.name + '</b><br/>' +
+                 feature.properties.summary + '<br/>' +
+                 '<i>' + feature.properties.visit + '</i><br/><br/>' +
+                 '<button onclick="openReport(\\'' + feature.properties.id + '\\')">Segnala problema</button>' +
+                 ' <button onclick="openDetail(\\'' + feature.properties.id + '\\')">Apri scheda</button>';
+      layer.bindPopup(html);
+    }
+
+    L.geoJSON(sites, {
+      onEachFeature: onEachFeature,
+      pointToLayer: function(feature, latlng) {
+        return L.marker(latlng);
+      }
+    }).addTo(map);
+
+    // Funzioni per pulsanti: aprono nuove pagine (o Issues)
+    window.openReport = function(id) {
+      // Apri la pagina "Issues" di GitHub (sostituisci con il link giusto)
+      window.open('https://github.com/donboscoragazzi-netizen/geolink/issues/new?title=Segnalazione+' + id + '&body=Descrivi+qui+il+problema', '_blank');
+    }
+    window.openDetail = function(id) {
+      alert('Qui si aprirebbe la scheda completa per ' + id + '. In una versione semplice la scheda può essere un file HTML separato o un blocco nella stessa pagina.');
+    }
+  </script>
+</body>
+</html>
 
